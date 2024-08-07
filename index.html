@@ -1,0 +1,71 @@
+template = Template('''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSIR-CRRI</title>
+    <style>
+        body {
+            background-color: #003151;
+            font-family: "Times New Roman", italic;
+        }
+        .container {
+            width: 500px;
+            margin: auto;
+            background-color: #BEBDB8;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .title {
+            text-align: center;
+            color: white;
+        }
+        .label {
+            color: white;
+        }
+        .button {
+            background-color: blue;
+            color: white;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .result {
+            background-color: #BEBDB8;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://www.bing.com/images/search?view=detailV2&ccid=agRFQ3p%2f&id=B6DB1EC577522AD088E1B6037104193F0B6CA003&thid=OIP.agRFQ3p_XLlV2PeskGaRbgAAAA&mediaurl=https%3a%2f%2f1.bp.blogspot.com%2f-fwgWRzPPn7A%2fXnroVRQtEsI%2fAAAAAAAAmU0%2fLVtA6fqwQMoFYdeolfhXQm3cGdY6XKAjQCLcBGAsYHQ%2fs1600%2fCSIR-CRRI.png&exph=93&expw=216&q=crri+logo+png&simid=607999982183873858&FORM=IRPRST&ck=3ACC58FC0219A9B6C22D16CB76E1788E&selectedIndex=4&itb=1" alt="CSIR-Central Road Research Institute logo"> style="width:80px;height:60px;">
+        <h1 class="title">CSIR-CRRI</h1>
+        <label class="label">Enter first number:</label>
+        <input type="text" id="num1" class="result"><br><br>
+        <label class="label">Enter second number:</label>
+        <input type="text" id="num2" class="result"><br><br>
+        <button class="button" onclick="calculate()">Calculate</button><br><br>
+        <label class="label">Result:</label>
+        <input type="text" id="result" class="result" readonly>
+    </div>
+    <script>
+        function calculate() {
+            var num1 = parseInt(document.getElementById('num1').value);
+            var num2 = parseInt(document.getElementById('num2').value);
+            if (isNaN(num1) || isNaN(num2)) {
+                alert("Please enter valid integers");
+                return;
+            }
+            var result = num1 * num1 + num2 * num2;
+            document.getElementById('result').value = result;
+        }
+    </script>
+</body>
+</html>
+''')
+
+
