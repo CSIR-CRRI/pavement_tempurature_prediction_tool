@@ -120,7 +120,7 @@
 
                 const predicted_temperature = predict_pavement_temperature(avg_at, t1, D);
 
-                document.getElementById('result').innerText = `Effective D: ${D}\nPreceding Hours: ${prhrs}\nAverage Air Temp: ${avg_at}\nCalculated Time: ${t1}\nPredicted Pavement Temperature: ${predicted_temperature}`;
+                document.getElementById('result').innerText = `Predicted Pavement Temperature: ${predicted_temperature}`;
             } catch (e) {
                 alert(`Error: ${e.message}`);
             }
