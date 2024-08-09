@@ -72,8 +72,8 @@
             return -0.0029 * (t ** 2) + 1.21 * t - 43.79;
         }
 
-        function calc_prhrs(D) {
-            return 0.436 * (D ** 0.61);
+        function calc_prhrs(t) {
+            return 0.436 * (t ** 0.61);
         }
 
         function calc_avg_at(at, prhrs) {
@@ -94,7 +94,7 @@
                 const d_low = calc_d_low(t);
                 const d_upp = calc_d_upp(t);
                 const D = (d_low + d_upp) / 2;
-                const prhrs = Math.ceil(calc_prhrs(D));
+                const prhrs = Math.ceil(calc_prhrs(t));
                 document.getElementById('preceding-hours').innerText = `Preceding Hours: ${prhrs}`;
             } catch (e) {
                 alert(`Error: ${e.message}`);
