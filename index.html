@@ -1,72 +1,133 @@
-template = Template('''
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>CSIR-CRRI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pavement Temperature Predictor</title>
     <style>
         body {
-            background-color: #003151;
-            font-family: "Times New Roman", italic;
+            font-family: "Times New Roman", Times, serif;
+            background-image: url('C:/Users/user/Downloads/pexels-pixabay-163848.png');
+            background-size: cover;
+            color: white;
+            text-align: center;
         }
         .container {
-            width: 500px;
-            margin: auto;
-            background-color: #BEBDB8;
+            background-color: rgba(0, 49, 81, 0.8);
             padding: 20px;
             border-radius: 10px;
+            display: inline-block;
+            margin-top: 50px;
         }
-        .title {
-            text-align: center;
-            color: white;
-        }
-        .label {
-            color: white;
-            border: black;
+        .input-field, .button, .result {
+            margin: 10px 0;
         }
         .button {
             background-color: blue;
             color: white;
-            width: 100%;
-            padding: 10px;
-            border: black;
+            padding: 10px 20px;
+            border: none;
             border-radius: 5px;
             cursor: pointer;
         }
+        .button:hover {
+            background-color: darkblue;
+        }
         .result {
-            background-color: #BEBDB8;
-            width: 100%;
+            background-color: white;
+            color: black;
             padding: 10px;
-            border: black;
             border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="csir_logo-removebg-preview.png" alt="CSIR-Central Road Research Institute logo"> 
-        <h1 class="title">CSIR-CRRI</h1>
-        <label class="label">Enter first number:</label>
-        <input type="text" id="num1" class="result"><br><br>
-        <label class="label">Enter second number:</label>
-        <input type="text" id="num2" class="result"><br><br>
-        <button class="button" onclick="calculate()">Calculate</button><br><br>
-        <label class="label">Result:</label>
-        <input type="text" id="result" class="result" readonly>
+        <img src="C:/Users/user/Downloads/csir_logo-removebg-preview.png" alt="CSIR Logo" style="width: 80px; height: 60px;">
+        <h1>Pavement Temperature Predictor</h1>
+        <div class="input-field">
+            <label for="thickness">Enter Thickness of Asphalt Layer:</label>
+            <input type="text" id="thickness" name="thickness">
+        </div>
+        <button class="button" onclick="calculatePrecedingHours()">Calculate Preceding Hours</button>
+        <div class="result" id="preceding-hours"></div>
+        <div class="input-field">
+            <label for="temperatures">Enter hourly temperatures (comma-separated):</label>
+            <input type="text" id="temperatures" name="temperatures">
+        </div>
+        <div class="input-field">
+            <label for="time">Enter Time (HH:MM) - 24Hr format only:</label>
+            <input type="text" id="time" name="time">
+        </div>
+        <button class="button" onclick="calculate()">Calculate</button>
+        <div class="result" id="result"></div>
     </div>
+
     <script>
-        function calculate() {
-            var num1 = parseInt(document.getElementById('num1').value);
-            var num2 = parseInt(document.getElementById('num2').value);
-            if (isNaN(num1) || isNaN(num2)) {
-                alert("Please enter valid integers");
-                return;
+        function calc_d_low(t) {
+            return 0.0578 * t + 34.35;
+        }
+
+        function calc_d_upp(t) {
+            return -0.0029 * (t ** 2) + 1.21 * t - 43.79;
+        }
+
+        function calc_prhrs(D) {
+            return 0.436 * (D ** 0.61);
+        }
+
+        function calc_avg_at(at, prhrs) {
+            return at.reduce((a, b) => a + b, 0) / prhrs;
+        }
+
+        function calculate_time(T) {
+            return 2 * Math.PI * Math.sin((T - 11) / 16);
+        }
+
+        function predict_pavement_temperature(avg_at, t1, D) {
+            return 6.281 + 0.029 * (avg_at ** 2) + 0.14 * t1 + 0.15 * Math.log(D);
+        }
+
+        function calculatePrecedingHours() {
+            try {
+                const t = parseInt(document.getElementById('thickness').value);
+                const d_low = calc_d_low(t);
+                const d_upp = calc_d_upp(t);
+                const D = (d_low + d_upp) / 2;
+                const prhrs = Math.ceil(calc_prhrs(D));
+                document.getElementById('preceding-hours').innerText = `Preceding Hours: ${prhrs}`;
+            } catch (e) {
+                alert(`Error: ${e.message}`);
             }
-            var result = num1 * num1 + num2 * num2;
-            document.getElementById('result').value = result;
+        }
+
+        function calculate() {
+            try {
+                const t = parseInt(document.getElementById('thickness').value);
+                const d_low = calc_d_low(t);
+                const d_upp = calc_d_upp(t);
+                const D = (d_low + d_upp) / 2;
+                const prhrs = Math.ceil(calc_prhrs(D));
+
+                const at = document.getElementById('temperatures').value.split(',').map(Number).slice(0, prhrs);
+                const avg_at = calc_avg_at(at, prhrs);
+
+                const time_input = document.getElementById('time').value.split(':');
+                const a0 = parseInt(time_input[0]);
+                const a1 = parseInt(time_input[1]) / 60;
+                const T = a0 + a1;
+                const t1 = calculate_time(T);
+
+                const predicted_temperature = predict_pavement_temperature(avg_at, t1, D);
+
+                document.getElementById('result').innerText = `Effective D: ${D}\nPreceding Hours: ${prhrs}\nAverage Air Temp: ${avg_at}\nCalculated Time: ${t1}\nPredicted Pavement Temperature: ${predicted_temperature}`;
+            } catch (e) {
+                alert(`Error: ${e.message}`);
+            }
         }
     </script>
 </body>
 </html>
-''')
+
 
 
