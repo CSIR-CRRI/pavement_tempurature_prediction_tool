@@ -52,7 +52,7 @@
         <button class="button" onclick="calculatePrecedingHours()">Calculate Preceding Hours</button>
         <div class="result" id="preceding-hours"></div>
         <div class="input-field">
-            <label for="temperatures">Enter hourly temperatures (comma-separated):</label>
+            <label for="temperatures">Enter hourly temperatures(℃) (comma-separated):</label>
             <input type="text" id="temperatures" name="temperatures">
         </div>
         <div class="input-field">
@@ -109,7 +109,7 @@
                 const D = (d_low + d_upp) / 2;
                 const prhrs = Math.ceil(calc_prhrs(D));
 
-                const at = document.getElementById('temperatures(℃)').value.split(',').map(Number).slice(0, prhrs);
+                const at = document.getElementById('temperatures').value.split(',').map(Number).slice(0, prhrs);
                 const avg_at = calc_avg_at(at, prhrs);
 
                 const time_input = document.getElementById('time').value.split(':');
