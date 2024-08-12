@@ -109,7 +109,7 @@
                 const D = (d_low + d_upp) / 2;
                 const prhrs = Math.ceil(calc_prhrs(D));
 
-                const at = document.getElementById('temperatures').value.split(',').map(Number).slice(0, prhrs);
+                const at = document.getElementById('temperatures(℃)').value.split(',').map(Number).slice(0, prhrs);
                 const avg_at = calc_avg_at(at, prhrs);
 
                 const time_input = document.getElementById('time').value.split(':');
@@ -120,7 +120,7 @@
 
                 const predicted_temperature = predict_pavement_temperature(avg_at, t1, D);
 
-                document.getElementById('result').innerText = `Predicted Pavement Temperature: ${predicted_temperature.toFixed(2)}`;
+                document.getElementById('result').innerText = `Predicted Pavement Temperature(℃): ${predicted_temperature.toFixed(2)}`;
             } catch (e) {
                 alert(`Error: ${e.message}`);
             }
