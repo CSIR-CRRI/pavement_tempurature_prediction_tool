@@ -6,21 +6,50 @@
     <title>Pavement Temperature Predictor</title>
     <style>
         body {
-            font-family: "Times New Roman", Times, serif;
+            font-family: 'Times New Roman', serif;
             background-image: url('pexels-pixabay-163848.png');
             background-size: cover;
-            color: white;
+            background-position: center;
+            color: White;
             text-align: center;
+            margin: 0;
+            padding: 0;
         }
         .container {
-            background-color: rgba(0, 49, 81, 0.8);
+            background-color: rgba(0, 0, 0, 0.2);
             padding: 20px;
             border-radius: 10px;
-            display: inline-block;
-            margin-top: 50px;
+            max-width: 900px;
+            margin: 50px auto;
+            font-size: 1.3em; /* Slightly increase font size */
         }
-        .input-field, .button, .result {
-            margin: 10px 0;
+        .logo {
+            width: 200px;
+            height: 150px;
+            margin-bottom: 10px;
+        }
+        .input-group {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .input-group label {
+            font-size: 1.3em; /* Slightly increased font size */
+            margin-left: 10px;
+        }
+        .input-group input, .input-group select {
+            width: 30%; /* Decreased width */
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1.3em; /* Slightly increased font size */
+        }
+        .note {
+            font-size: 1.1em; /* Slightly increased font size */
+            color: White;
+            text-align: left; /* Align note to the left */
+            margin-left: 10px; /* Ensure it starts from the extreme left */
         }
         .button {
             background-color: blue;
@@ -29,36 +58,85 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 1.3em; /* Slightly increased font size */
         }
         .button:hover {
             background-color: darkblue;
         }
         .result {
-            background-color: white;
-            color: black;
-            padding: 10px;
+            margin-top: 20px;
+            font-size: 1.6em; /* Slightly increased font size */
+            color: #fff;
+        }
+        .hourly-temperature {
+            font-size: 1.1em; /* Slightly increased font size */
+            width: 50px; /* Increase width */
+            height: 30px; /* Adjust height */
+            padding: 3px; /* Further adjust padding */
+        }
+        .label {
+            display: inline-block;
+            width: 100px; /* Adjust width as needed */
+            text-align: right; /* Align text to the right */
+            margin-right: 10px; /* Space between label and text box */
+            font-size: 1.3em; /* Slightly increased font size */
+        }
+        .text-box {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .time-input {
+            width: 20px; /* Decrease width */
+            height: 30px; /* Make the boxes square */
+            padding: 5px;
+            border: 1px solid #ccc;
             border-radius: 5px;
+            text-align: center;
+            font-size: 1.3em; /* Slightly increased font size */
+            -moz-appearance: textfield; /* Remove spin buttons in Firefox */
+        }
+        .time-input::-webkit-outer-spin-button,
+        .time-input::-webkit-inner-spin-button {
+            -webkit-appearance: none; /* Remove spin buttons in Chrome, Safari, Edge, and Opera */
+            margin: 0;
+        }
+        .temperature-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .time-group {
+            display: flex;
+            align-items: center;
+        }
+        .time-group span {
+            margin: 0 5px; /* Adjust spacing between hour and minute inputs */
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="csir_logo-removebg-preview.png" alt="CSIR Logo" style="width: 80px; height: 60px;">
+        <img src="1234-removebg-preview.png" alt="Logo" class="logo">
         <h1>Pavement Temperature Predictor</h1>
-        <div class="input-field">
-            <label for="thickness">Enter Thickness of Asphalt Layer:</label>
-            <input type="text" id="thickness" name="thickness">
+        <div class="input-group">
+            <label for="thickness">Enter Thickness of Asphalt Layer (mm):</label>
+            <input type="number" id="thickness" oninput="updatePrecedingHours()">
         </div>
-        <button class="button" onclick="calculatePrecedingHours()">Calculate Preceding Hours</button>
-        <div class="result" id="preceding-hours"></div>
-        <div class="input-field">
-            <label for="temperatures">Enter hourly temperatures (comma-separated):</label>
-            <input type="text" id="temperatures" name="temperatures">
+        <p class="note">* Total thickness of bituminous layers including wearing & binder courses</p>
+        <div class="input-group">
+            <label for="preceding-hours">Number of Preceding Hours:</label>
+            <input type="text" id="preceding-hours" readonly>
         </div>
-        <div class="input-field">
-            <label for="time">Enter Time (HH:MM) - 24Hr format only:</label>
-            <input type="text" id="time" name="time">
+        <p class="note">* For calculation of requisite Average Air Temperature</p>
+        <div class="input-group">
+            <label>Enter Hourly Average Air Temperature (in ℃):</label>
         </div>
+        <div id="temperature-entries" class="temperature-row"></div>
+        <div class="input-group">
+            <label for="time">Enter Time (HH:MM):</label>
+            <input type="time" id="time" class="time-input" min="00:00" max="23:59">
+        </div>
+        <p class="note">* Time of the day at which pavement temperature needs to be predicted (in 24-hours format)</p>
         <button class="button" onclick="calculate()">Calculate</button>
         <div class="result" id="result"></div>
     </div>
@@ -85,19 +163,37 @@
         }
 
         function predict_pavement_temperature(avg_at, t1, D) {
-            return 6.281 + 0.029 * (avg_at ** 2) + 0.14 * t1 + 0.15 * Math.log(D);
+            const temperature = 6.281 + 0.029 * (avg_at ** 2) + 0.14 * t1 + 0.15 * Math.log(D);
+            return temperature.toFixed(2);
         }
 
-        function calculatePrecedingHours() {
-            try {
-                const t = parseInt(document.getElementById('thickness').value);
+        function updatePrecedingHours() {
+            const t = parseInt(document.getElementById('thickness').value);
+            if (!isNaN(t)) {
                 const d_low = calc_d_low(t);
                 const d_upp = calc_d_upp(t);
                 const D = (d_low + d_upp) / 2;
                 const prhrs = Math.ceil(calc_prhrs(t));
-                document.getElementById('preceding-hours').innerText = `Preceding Hours: ${prhrs}`;
-            } catch (e) {
-                alert(`Error: ${e.message}`);
+                document.getElementById('preceding-hours').value = prhrs;
+                generateTemperatureEntries(prhrs);
+            } else {
+                document.getElementById('preceding-hours').value = '';
+                document.getElementById('temperature-entries').innerHTML = '';
+            }
+        }
+
+        function generateTemperatureEntries(prhrs) {
+            const container = document.getElementById('temperature-entries');
+            container.innerHTML = '';
+            for (let i = 0; i < prhrs; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.id = `hour-${i + 1}`;
+                input.className = 'hourly-temperature text-box';
+                input.placeholder = `H${i + 1}`;
+                input.style.width = '50px'; /* Increase width */
+                input.style.height = '30px'; /* Adjust height */
+                container.appendChild(input);
             }
         }
 
@@ -107,27 +203,31 @@
                 const d_low = calc_d_low(t);
                 const d_upp = calc_d_upp(t);
                 const D = (d_low + d_upp) / 2;
-                const prhrs = Math.ceil(calc_prhrs(D));
+                const prhrs = Math.ceil(calc_prhrs(t));
 
-                const at = document.getElementById('temperatures').value.split(',').map(Number).slice(0, prhrs);
+                const at = [];
+                for (let i = 0; i < prhrs; i++) {
+                    const temp = parseFloat(document.getElementById(`hour-${i + 1}`).value);
+                    if (!isNaN(temp)) {
+                        at.push(temp);
+                    }
+                }
                 const avg_at = calc_avg_at(at, prhrs);
 
-                const time_input = document.getElementById('time').value.split(':');
-                const a0 = parseInt(time_input[0]);
-                const a1 = parseInt(time_input[1]) / 60;
-                const T = a0 + a1;
+                const time = document.getElementById('time').value.split(':');
+                const hours = parseInt(time[0]);
+                const minutes = parseInt(time[1]) / 60;
+                const T = hours + minutes;
                 const t1 = calculate_time(T);
 
                 const predicted_temperature = predict_pavement_temperature(avg_at, t1, D);
 
-                document.getElementById('result').innerText = `Predicted Pavement Temperature(℃): ${predicted_temperature.toFixed(2)}`;
+                document.getElementById('result').innerText = `Predicted Pavement Temperature: ${predicted_temperature} ℃`;
             } catch (e) {
-                alert(`Error: ${e.message}`);
+                alert('Error: ' + e.message);
             }
         }
     </script>
 </body>
 </html>
-
-
 
