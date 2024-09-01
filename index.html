@@ -119,7 +119,7 @@
         <img src="1234-removebg-preview.png" alt="Logo" class="logo">
         <h1>Pavement Temperature Predictor</h1>
         <div class="input-group">
-            <label for="thickness">Enter Thickness of Asphalt Layer (mm):</label>
+            <label for="thickness">Enter thickness of bituminous Layer (mm):</label>
             <input type="number" id="thickness" oninput="updatePrecedingHours()">
         </div>
         <p class="note">* Total thickness of bituminous layers including wearing & binder courses</p>
@@ -127,7 +127,7 @@
             <label for="preceding-hours">Number of Preceding Hours:</label>
             <input type="text" id="preceding-hours" readonly>
         </div>
-        <p class="note">* For calculation of requisite Average Air Temperature</p>
+        <p class="note">* For calculation of requisite average air temperature</p>
         <div class="input-group">
             <label>Enter Hourly Average Air Temperature (in ℃):</label>
         </div>
@@ -200,6 +200,11 @@
         function calculate() {
             try {
                 const t = parseInt(document.getElementById('thickness').value);
+                if (isNaN(t) || t <= 0) {
+                    alert('Please enter a valid thickness.');
+                    return;
+                }
+
                 const d_low = calc_d_low(t);
                 const d_upp = calc_d_upp(t);
                 const D = (d_low + d_upp) / 2;
@@ -208,20 +213,30 @@
                 const at = [];
                 for (let i = 0; i < prhrs; i++) {
                     const temp = parseFloat(document.getElementById(`hour-${i + 1}`).value);
-                    if (!isNaN(temp)) {
-                        at.push(temp);
+                    if (isNaN(temp)) {
+                        alert('Please enter all the required hourly average air temperatures.');
+                        return;
                     }
+                    at.push(temp);
                 }
+
                 const avg_at = calc_avg_at(at, prhrs);
 
-                const time = document.getElementById('time').value.split(':');
-                const hours = parseInt(time[0]);
-                const minutes = parseInt(time[1]) / 60;
+                const time = document.getElementById('time').value;
+                if (!time) {
+                    alert('Please enter the time.');
+                    return;
+                }
+
+                const timeParts = time.split(':');
+                const hours = parseInt(timeParts[0]);
+                                const minutes = parseInt(timeParts[1]) / 60;
                 const T = hours + minutes;
                 const t1 = calculate_time(T);
 
                 const predicted_temperature = predict_pavement_temperature(avg_at, t1, D);
 
+                // Display the result only if all data is provided
                 document.getElementById('result').innerText = `Predicted Pavement Temperature: ${predicted_temperature} ℃`;
             } catch (e) {
                 alert('Error: ' + e.message);
@@ -230,4 +245,3 @@
     </script>
 </body>
 </html>
-
