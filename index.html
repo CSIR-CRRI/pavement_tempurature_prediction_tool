@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,7 +64,7 @@
             background-color: darkblue;
         }
         .result {
-            margin-top: 15px;
+            margin-top: 20px;
             font-size: 1.6em; /* Slightly increased font size */
             color: #fff;
             background-color: rgba(0, 0, 0, 0.5); /* Add background color */
@@ -73,7 +72,7 @@
             border-radius: 5px; /* Add border radius */
         }
         .hourly-temperature {
-            font-size: 1.1em; /* Slightly increased font size */
+            font-size: 0.9em; /* Decreased font size */
             width: 50px; /* Increase width */
             height: 30px; /* Adjust height */
             padding: 3px; /* Further adjust padding */
@@ -123,7 +122,7 @@
         <img src="1234-removebg-preview.png" alt="Logo" class="logo">
         <h1>Pavement Temperature Predictor</h1>
         <div class="input-group">
-            <label for="thickness">Enter Thickness of Asphalt Layer (mm):</label>
+            <label for="thickness">Enter Thickness of Bituminous Layer (mm):</label>
             <input type="number" id="thickness" oninput="updatePrecedingHours()">
         </div>
         <p class="note">* Total thickness of bituminous layers including wearing & binder courses</p>
@@ -222,9 +221,9 @@
 
                 const at = [];
                 for (let i = 0; i < prhrs; i++) {
-                                        const temp = parseFloat(document.getElementById(`hour-${i + 1}`).value);
+                    const temp = parseFloat(document.getElementById(`hour-${i + 1}`).value);
                     if (isNaN(temp)) {
-                        alert('Please enter all the required hourly average air temperatures.');
+                                                alert('Please enter all the required hourly average air temperatures.');
                         return;
                     }
                     at.push(temp);
@@ -247,7 +246,10 @@
                 const predicted_temperature = predict_pavement_temperature(avg_at, t1, D);
 
                 // Display the result only if all data is provided
-                document.getElementById('result').innerText = `Predicted Pavement Temperature: ${predicted_temperature} ℃`;
+                document.getElementById('result').innerHTML = `
+                    Predicted Pavement Temperature: ${predicted_temperature} ℃<br>
+                    Effective Depth: ${D.toFixed(0)} mm
+                `;
             } catch (e) {
                 alert('Error: ' + e.message);
             }
